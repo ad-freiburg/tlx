@@ -142,7 +142,7 @@ public:
 
 //! Override default output: never or always output log.
 #define TLX_LOG0 TLX_LOGC(false)
-#define TLX_LOG1 TLX_LOGC(true)
+#define TLX_LOG1 TLX_LOGC(false)
 
 //! Explicitly specify the condition for logging
 #define TLX_sLOGC(cond) \
