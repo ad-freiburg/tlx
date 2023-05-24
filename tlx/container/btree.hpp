@@ -234,7 +234,7 @@ private:
     //! data items.
     struct InnerNode : public node {
         //! Define an related allocator for the InnerNode structs.
-        typedef typename Allocator::template rebind<InnerNode>::other alloc_type;
+        typedef typename std::allocator_traits<Allocator>::template rebind_alloc<InnerNode> alloc_type;
 
         //! Keys of children or data pointers
         key_type slotkey[inner_slotmax]; // NOLINT
@@ -272,7 +272,7 @@ private:
     //! data items. Key and data slots are kept together in value_type.
     struct LeafNode : public node {
         //! Define an related allocator for the LeafNode structs.
-        typedef typename Allocator::template rebind<LeafNode>::other alloc_type;
+        typedef typename std::allocator_traits<Allocator>::template rebind_alloc<LeafNode> alloc_type;
 
         //! Double linked list pointers to traverse the leaves
         LeafNode* prev_leaf;
@@ -1271,15 +1271,15 @@ private:
         if (n->is_leafnode()) {
             LeafNode* ln = static_cast<LeafNode*>(n);
             typename LeafNode::alloc_type a(leaf_node_allocator());
-            a.destroy(ln);
-            a.deallocate(ln, 1);
+            std::allocator_traits<typename LeafNode::alloc_type>::destroy(a, ln);
+            std::allocator_traits<typename LeafNode::alloc_type>::deallocate(a, ln, 1);
             stats_.leaves--;
         }
         else {
             InnerNode* in = static_cast<InnerNode*>(n);
             typename InnerNode::alloc_type a(inner_node_allocator());
-            a.destroy(in);
-            a.deallocate(in, 1);
+            std::allocator_traits<typename InnerNode::alloc_type>::destroy(a, in);
+            std::allocator_traits<typename InnerNode::alloc_type>::deallocate(a, in, 1);
             stats_.inner_nodes--;
         }
     }
@@ -2256,7 +2256,7 @@ public:
                 "BTree::bulk_load, level " << level <<
                     ": " << num_children << " children in " <<
                     num_parents << " inner nodes with up to " <<
-                ((num_children + num_parents - 1) / num_parents) <<
+                    ((num_children + num_parents - 1) / num_parents) <<
                     " children per inner node.");
 
             size_t inner_index = 0;
